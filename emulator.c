@@ -207,12 +207,82 @@ void execute_rtype(Instruction instruction, Processor *processor) {
 }
 
 void execute_itype_except_load(Instruction instruction, Processor *processor) {
+	int shift_imm;
     switch (instruction.itype.funct3) {
         /* YOUR CODE HERE */
+        case 0x0:
+            // print_itype_except_load("addi", instruction, instruction.itype.imm);
+            processor->R[instruction.itype.rd] = 
+                ((sWord)processor->R[instruction.itype.rs1]) +
+                (sign_extend_number(instruction.itype.imm, 12));
+            break;
+        case 0x1:
+            // print_itype_except_load("slli", instruction, instruction.itype.imm);
+            processor->R[instruction.itype.rd] = 
+                ((sWord)processor->R[instruction.itype.rs1]) <<
+                (sign_extend_number(instruction.itype.imm, 12));
+            break;
+        case 0x2:
+            // print_itype_except_load("slti", instruction, instruction.itype.imm);
+            processor->R[instruction.itype.rd] = 
+                (((sWord)processor->R[instruction.itype.rs1]) <
+                (sign_extend_number(instruction.itype.imm, 12)))?1:0;
+            break;
+        case 0x3:
+            // print_itype_except_load("sltiu", instruction, instruction.itype.imm);
+            processor->R[instruction.itype.rd] = 
+                (((sWord)processor->R[instruction.itype.rs1]) <
+                (sign_extend_number(instruction.itype.imm, 12)))?1:0;
+            break;
+        case 0x4:
+            // print_itype_except_load("xori", instruction, instruction.itype.imm);
+            processor->R[instruction.itype.rd] = 
+                ((sWord)processor->R[instruction.itype.rs1]) ^
+                (sign_extend_number(instruction.itype.imm, 12));
+            break;
+        case 0x5:
+            shift_imm = instruction.itype.imm >> 5;
+            switch(shift_imm) {
+                case 0x00:
+                shift_imm = 31;
+                shift_imm = shift_imm & instruction.itype.imm;
+                // print_itype_except_load("srli", instruction, instruction.itype.imm);
+                processor->R[instruction.itype.rd] = 
+                    ((sWord)processor->R[instruction.itype.rs1]) >>
+                    (sign_extend_number(instruction.itype.imm, 12));
+                    break;
+                case 0x20:
+                    // print_itype_except_load("srai", instruction, shift_imm);
+                shift_imm = 31;
+                shift_imm = shift_imm & instruction.itype.imm;
+                processor->R[instruction.itype.rd] = 
+                    ((sWord)processor->R[instruction.itype.rs1]) >>
+                    (sign_extend_number(instruction.itype.imm, 12));
+                    break;
+                default:
+                    handle_invalid_instruction(instruction);
+                    break;
+            }
+            break;
+        case 0x6:
+            // print_itype_except_load("ori", instruction, instruction.itype.imm);
+            processor->R[instruction.itype.rd] = 
+            ((sWord)processor->R[instruction.itype.rs1]) |
+            (sign_extend_number(instruction.itype.imm, 12));
+            break;
+        case 0x7:
+            // print_itype_except_load("andi", instruction, instruction.itype.imm);
+            processor->R[instruction.itype.rd] = 
+            ((sWord)processor->R[instruction.itype.rs1]) &
+            (sign_extend_number(instruction.itype.imm, 12));
+            break;
+      /* call print_itype_except_load */
         default:
             handle_invalid_instruction(instruction);
-            break;
+            break;  
     }
+    // update PC
+    processor->PC += 4;
 }
 
 void execute_ecall(Processor *p, Byte *memory) {
@@ -331,6 +401,24 @@ void execute_jal(Instruction instruction, Processor *processor) {
 
 void execute_lui(Instruction instruction, Processor *processor) {
     /* YOUR CODE HERE */
+    switch (instruction.utype.opcode){
+        case 0x17:
+            processor->R[instruction.utype.rd] = 
+            (processor->PC) +
+            ((sign_extend_number(instruction.itype.imm, 20)) << 12);
+            break;
+        case 0x37:
+            processor->R[instruction.utype.rd] = 
+            (sign_extend_number(instruction.utype.imm, 20)) << 12;
+            break;
+	/* deal with other cases */
+        default:
+            handle_invalid_instruction(instruction);
+            exit(-1);
+            break;
+    }
+    // update PC
+    processor->PC += 4;
 }
 
 void store(Byte *memory, Address address, Alignment alignment, Word value) {
