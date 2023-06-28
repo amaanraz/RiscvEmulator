@@ -381,8 +381,31 @@ void execute_load(Instruction instruction, Processor *processor, Byte *memory) {
 }
 
 void execute_store(Instruction instruction, Processor *processor, Byte *memory) {
+    int mem_address;
     switch (instruction.stype.funct3) {
         /* YOUR CODE HERE */
+        case 0x0:
+            mem_address = 
+                ((sWord)processor->R[instruction.stype.rs1]) +
+                (get_store_offset(instruction));
+            processor->R[instruction.stype.rs2] = load(memory, mem_address, LENGTH_BYTE);
+            store(memory, mem_address, LENGTH_BYTE, processor->R[instruction.stype.rs2]);
+            break;
+        case 0x1:
+            mem_address = 
+                ((sWord)processor->R[instruction.stype.rs1]) +
+                (get_store_offset(instruction));
+            processor->R[instruction.stype.rs2] = load(memory, mem_address, LENGTH_HALF_WORD);
+            store(memory, mem_address, LENGTH_HALF_WORD, processor->R[instruction.stype.rs2]);
+            break;
+        case 0x2:
+            mem_address = 
+                ((sWord)processor->R[instruction.stype.rs1]) +
+                (get_store_offset(instruction));
+            processor->R[instruction.stype.rs2] = load(memory, mem_address, LENGTH_WORD);
+            store(memory, mem_address, LENGTH_WORD, processor->R[instruction.stype.rs2]);
+
+            break;
         default:
             handle_invalid_instruction(instruction);
             exit(-1);
@@ -422,7 +445,17 @@ void execute_lui(Instruction instruction, Processor *processor) {
 }
 
 void store(Byte *memory, Address address, Alignment alignment, Word value) {
-    /* YOUR CODE HERE */
+    if(alignment == LENGTH_BYTE) {
+        memory[address] = value;
+    } else if(alignment == LENGTH_HALF_WORD) {
+        memory[((address+1) << 8) + address] = value;
+    } else if(alignment == LENGTH_WORD) {
+        memory[((address+3) << 24) + ((address+2) << 16)
+               + ((address+1) << 8) + address] = value;
+    } else {
+        printf("Error: Unrecognized alignment %d\n", alignment);
+        exit(-1);
+    }
 }
 
 Word load(Byte *memory, Address address, Alignment alignment) {
