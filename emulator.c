@@ -335,7 +335,7 @@ void execute_branch(Instruction instruction, Processor *processor) {
             // print_branch("bne", instruction);
             if(processor->R[instruction.sbtype.rs1] != processor->R[instruction.sbtype.rs2]){
                 // PC += imm
-                processor->PC += (instruction.sbtype.imm7 << 5) | instruction.sbtype.imm5;;
+                processor->PC += get_branch_offset(instruction);
             } else {
                 // update PC
                 processor->PC += 4;
@@ -357,19 +357,19 @@ void execute_load(Instruction instruction, Processor *processor, Byte *memory) {
             // rd = M[rs1+imm][0:7]
             processor->R[instruction.itype.rd] = load(memory,
                 (sWord)processor->R[instruction.itype.rs1] + (sWord)instruction.itype.imm,
-                1);
+                LENGTH_BYTE);
             break;
         case 0x1:
             // print_load("lh", instruction);
             processor->R[instruction.itype.rd] = load(memory,
                 (sWord)processor->R[instruction.itype.rs1] + (sWord)instruction.itype.imm,
-                2);
+                LENGTH_HALF_WORD);
             break;
         case 0x2:
             // print_load("lw", instruction);
             processor->R[instruction.itype.rd] = load(memory,
                 (sWord)processor->R[instruction.itype.rs1] + (sWord)instruction.itype.imm,
-                4);
+                LENGTH_WORD);
             break;
         default:
             handle_invalid_instruction(instruction);
