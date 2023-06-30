@@ -388,21 +388,21 @@ void execute_store(Instruction instruction, Processor *processor, Byte *memory) 
             mem_address = 
                 ((sWord)processor->R[instruction.stype.rs1]) +
                 (get_store_offset(instruction));
-            processor->R[instruction.stype.rs2] = load(memory, mem_address, LENGTH_BYTE);
+            // processor->R[instruction.stype.rs2] = load(memory, mem_address, LENGTH_BYTE);
             store(memory, mem_address, LENGTH_BYTE, processor->R[instruction.stype.rs2]);
             break;
         case 0x1:
             mem_address = 
                 ((sWord)processor->R[instruction.stype.rs1]) +
                 (get_store_offset(instruction));
-            processor->R[instruction.stype.rs2] = load(memory, mem_address, LENGTH_HALF_WORD);
+            // processor->R[instruction.stype.rs2] = load(memory, mem_address, LENGTH_HALF_WORD);
             store(memory, mem_address, LENGTH_HALF_WORD, processor->R[instruction.stype.rs2]);
             break;
         case 0x2:
             mem_address = 
                 ((sWord)processor->R[instruction.stype.rs1]) +
                 (get_store_offset(instruction));
-            processor->R[instruction.stype.rs2] = load(memory, mem_address, LENGTH_WORD);
+            // processor->R[instruction.stype.rs2] = load(memory, mem_address, LENGTH_WORD);
             store(memory, mem_address, LENGTH_WORD, processor->R[instruction.stype.rs2]);
 
             break;
@@ -411,6 +411,8 @@ void execute_store(Instruction instruction, Processor *processor, Byte *memory) 
             exit(-1);
             break;
     }
+    // update PC
+    processor->PC += 4;
 }
 
 void execute_jal(Instruction instruction, Processor *processor) {
@@ -452,7 +454,8 @@ void store(Byte *memory, Address address, Alignment alignment, Word value) {
         memory[address] = value;
         memory[address+1] = bit8;
     } else if(alignment == LENGTH_WORD) {
-        int bit8 = value >> 8;
+        int bit0 = value;
+        int bit8 = bit0 >> 8;
         int bit16 = bit8 >> 8;
         int bit24 = bit16 >> 8;
         memory[address] = value;
