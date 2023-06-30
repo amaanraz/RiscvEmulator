@@ -445,7 +445,7 @@ void execute_lui(Instruction instruction, Processor *processor) {
 }
 
 void store(Byte *memory, Address address, Alignment alignment, Word value) {
-	    if(alignment == LENGTH_BYTE) {
+    if(alignment == LENGTH_BYTE) {
         memory[address]= value;
     } else if(alignment == LENGTH_HALF_WORD) {
         int bit8 = value >> 8;
