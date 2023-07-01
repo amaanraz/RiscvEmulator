@@ -355,21 +355,21 @@ void execute_load(Instruction instruction, Processor *processor, Byte *memory) {
         case 0x0:
             // lb load byte
             // rd = M[rs1+imm][0:7]
-            processor->R[instruction.itype.rd] = load(memory,
+            processor->R[instruction.itype.rd] = sign_extend_number(load(memory,
                 (sWord)processor->R[instruction.itype.rs1] + (sWord)instruction.itype.imm,
-                LENGTH_BYTE);
+                LENGTH_BYTE),8);
             break;
         case 0x1:
             // print_load("lh", instruction);
-            processor->R[instruction.itype.rd] = load(memory,
+            processor->R[instruction.itype.rd] = sign_extend_number(load(memory,
                 (sWord)processor->R[instruction.itype.rs1] + (sWord)instruction.itype.imm,
-                LENGTH_HALF_WORD);
+                LENGTH_HALF_WORD),16);
             break;
         case 0x2:
             // print_load("lw", instruction);
-            processor->R[instruction.itype.rd] = load(memory,
+            processor->R[instruction.itype.rd] = sign_extend_number(load(memory,
                 (sWord)processor->R[instruction.itype.rs1] + (sWord)instruction.itype.imm,
-                LENGTH_WORD);
+                LENGTH_WORD),32);
             break;
         default:
             handle_invalid_instruction(instruction);
